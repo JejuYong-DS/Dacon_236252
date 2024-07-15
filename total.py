@@ -232,6 +232,6 @@ df_sample_submission = pd.read_csv('sample_submission.csv', encoding='utf-8')
 df_sample_submission = pd.concat((df_sample_submission['id'],df_predict_proba), axis=1)
 
 # csv 파일 저장
-df_sample_submission.to_csv('sample_submission.csv', encoding = 'utf-8')
+df_sample_submission.to_csv('sample_submission.csv', encoding = 'utf-8', index=False)
 
 print('predict_proba_complete')
