@@ -28,17 +28,21 @@ from pyannote.audio import Pipeline
 
 import warnings
 warnings.filterwarnings('ignore')
+
 #%% path
 link = r'C:\Users\rhwnd\Downloads\open' # 개인 PC 환경에 맞추어 수정
 os.chdir(link)
 
+# API key
+your_key = your_API_key
+
 pipeline_voice_activity_detection = Pipeline.from_pretrained(
     "pyannote/voice-activity-detection",
-    use_auth_token="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")
+    use_auth_token=your_key)
 
 pipeline_speaker_diarization = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token="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")
+    use_auth_token=your_key)
 
 #%% data load
 df_train_label = pd.read_csv('train.csv', encoding='utf-8')
@@ -56,21 +60,19 @@ for i, audio_path in enumerate(df_train_label['path']):
 print('---train_data_load_complete---')
 #%% 음성 데이터에서 특성 추출하기
 def STFT_MFCC(y, i=None, sr = 32000, n_fft = 1024, n_mfcc = 13): #512, 1024, 2048
-    # STFT : Short Time Fourier Transform
+    # STFT: Short Time Fourier Transform
     D = librosa.stft(y, n_fft=n_fft, win_length = n_fft, hop_length=n_fft//4)
     stft_db = librosa.amplitude_to_db(abs(D), ref=np.max)
     stft_features = np.mean(stft_db, axis=1)
 
-    #MFCC : Mel-Frequency Cepstral Coefficients
+    #MFCC: Mel-Frequency Cepstral Coefficients
     mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc, n_fft=n_fft, hop_length=n_fft//4)
     mfcc_features = np.mean(mfcc, axis=1)
     
     #concat
     features = np.concatenate((stft_features, mfcc_features))
     #진행 상황
-    if i :
-        print(i)
-    
+    if i % (len(df_train_label) // 1000) == 0: print(f'{i/len(df_train_label)*100}%')
     return features
 
 #%% 특성 추출
@@ -80,7 +82,7 @@ y = np.array(df_train_label['label'])
 print('---feature_extraction_complete---')
 
 #%% XGBoost 모델링
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0) #random_seed
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0)  #random_seed
 
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
@@ -146,6 +148,7 @@ def noise_removal(audio, noise_freq_band=(1000, 2000)):
     # visualization(audio, cleaned_audio)
     
     return cleaned_audio
+
 #%% 노이즈 제거 2
 def data_cleaning(audio):
     # Convert the audio to a PyTorch tensor
@@ -163,7 +166,7 @@ def data_cleaning(audio):
         end = int(segment.end * sr)
         cleaned_audio[start:end] = audio[start:end]
     return cleaned_audio
-    # visualization(audio, cleaned_audio)
+
 #%% 노이즈 제거 3
 def peak_mask(audio):
     mask_len = len(audio)
@@ -191,7 +194,8 @@ def CDS_Model(audio):
     speakers = {}
     # print the result
     for turn, _, speaker in diarization.itertracks(yield_label=True):
-        start = int(turn.start * 32000) ; end = int(turn.end * 32000)
+        start = int(turn.start*32000)
+        end = int(turn.end*32000)
         speaker_audio = audio[0][start:end]
         speakers[f'{speaker}'] = speaker_audio
     # print(len(speakers.keys()))
@@ -207,7 +211,7 @@ def CDS_Model(audio):
         if max(predict_proba_1) <= 0.60 : return predict_proba_0.tolist()
         
         # 두 목소리가 real & fake일 경우, [1,1]로 return
-        if (predict_proba_0[0] > predict_proba_0[1]) != (predict_proba_1[0] > predict_proba_1[1]) : return [1,1]
+        if (predict_proba_0[0] > predict_proba_0[1]) != (predict_proba_1[0] > predict_proba_1[1]): return [1,1]
         
         # 두 목소라가 real,real이거나 fake,fake일 경우, 최대 확률로 return
         if max(predict_proba_0) > max(predict_proba_1): return predict_proba_0.tolist()
@@ -283,3 +287,4 @@ df_sample_submission = pd.concat((df_sample_submission['id'],df_predict_proba), 
 df_sample_submission.to_csv('sample_submission_8.csv', encoding = 'utf-8', index=False)
 
 print('predict_proba_complete')
+
