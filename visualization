@@ -1,0 +1,43 @@
+sr = 32000; n_fft = 1024; n_mfcc = 13
+
+mfcc = librosa.feature.mfcc(y=train_ogg_list[0], sr=sr, n_mfcc=n_mfcc, n_fft=n_fft, hop_length=n_fft//4)
+mfcc_features = np.mean(mfcc, axis=1)
+
+plt.figure(figsize=(16,7))
+librosa.display.specshow(mfcc, sr=sr, hop_length=n_fft//4)
+plt.xlabel("Time")
+plt.ylabel("MFCC coefficients")
+plt.colorbar()
+plt.title("MFCCs")
+ 
+# show plots
+plt.show()
+
+
+# =========================================================================================================================================
+
+# STFT -> spectrogram
+hop_length = n_fft//4
+n_fft = 2048
+ 
+# calculate duration hop length and window in seconds
+hop_length_duration = float(hop_length)/sr
+n_fft_duration = float(n_fft)/sr
+ 
+# STFT
+stft = librosa.stft(train_ogg_list[0], n_fft=n_fft, hop_length=hop_length)
+ 
+# 복소공간 값 절댓값 취하기
+magnitude = np.abs(stft)
+ 
+# magnitude > Decibels
+log_spectrogram = librosa.amplitude_to_db(magnitude)
+ 
+# display spectrogram
+plt.figure(figsize=(16,7))
+librosa.display.specshow(log_spectrogram, sr=sr, hop_length=hop_length)
+plt.xlabel("Time")
+plt.ylabel("Frequency")
+plt.colorbar(format="%+2.0f dB")
+plt.title("Spectrogram (dB)")
+plt.show()
