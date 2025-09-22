@@ -4,7 +4,7 @@
 
 CDS팀
 
-total.py 파일을 다운받으시면 됩니다.
+total_final.py 파일을 다운받으시면 됩니다.
 
 <분석 과정>
 
