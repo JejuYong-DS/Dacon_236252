@@ -33,14 +33,12 @@ import warnings
 warnings.filterwarnings('ignore')
 #%% path
 link = r'C:\Users\PC\Desktop\Korea_Univ\CDS_LAB\연구3\소중대_데이콘\data'
-# 추가
-
-
+api_key = ""
 
 
 pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token="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")
+    use_auth_token=api_key)
 
 #%% data load
 df_train_label = pd.read_csv('train.csv', encoding='utf-8')
@@ -190,7 +188,7 @@ def VAD(audio, sr=32000, vad_mode = 0, ms = 10, min_speech_duration_ms = 300):
 # from pyannote.audio import Pipeline, Model
 
 # model = Model.from_pretrained("pyannote/segmentation", 
-#                                     use_auth_token="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"
+#                                     use_auth_token=api_key
 #                                     )
 # from pyannote.audio.pipelines import VoiceActivityDetection
 # pipeline = VoiceActivityDetection(segmentation=model)
@@ -272,6 +270,7 @@ df_sample_submission = pd.read_csv('sample_submission.csv', encoding='utf-8')
 df_sample_submission = pd.concat((df_sample_submission['id'],df_predict_proba), axis=1)
 
 df_sample_submission
+
 
 
 
