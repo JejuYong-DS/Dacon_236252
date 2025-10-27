@@ -30,15 +30,16 @@ import warnings
 warnings.filterwarnings('ignore')
 #%% path
 link = r'C:\Users\PC\Desktop\Korea_Univ\CDS_LAB\연구3\소중대_데이콘\data' # 개인 PC 환경에 맞추어 수정
+api_key = ""
 os.chdir(link)
 
 pipeline_voice_activity_detection = Pipeline.from_pretrained(
     "pyannote/voice-activity-detection",
-    use_auth_token="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")
+    use_auth_token=api_key)
 
 pipeline_speaker_diarization = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token="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")
+    use_auth_token=api_key)
 
 #%% data load
 df_train_label = pd.read_csv('train.csv', encoding='utf-8')
