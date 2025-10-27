@@ -25,6 +25,8 @@ import torchaudio
 #%% path
 link = r'C:\Users\PC\Desktop\Korea_Univ\CDS_LAB\연구3\소중대_데이콘\data'
 
+api_key = ""
+
 #%% 노이즈 제거
 def visualization(audio, cleaned_audio):
     plt.figure(figsize=(10, 4))
@@ -191,7 +193,7 @@ for y in unlabeled_ogg_list:
 from pyannote.audio import Pipeline
 pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token="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")
+    use_auth_token=api_key)
 
 # GPU 사용으로 전환
 import torch
@@ -264,6 +266,7 @@ def determine():
         step_3()
         
         
+
 
 
 
