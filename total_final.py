@@ -34,15 +34,15 @@ link = r'C:\Users\rhwnd\Downloads\open' # 개인 PC 환경에 맞추어 수정
 os.chdir(link)
 
 # API key
-your_key = your_API_key
+api_key = ""
 
 pipeline_voice_activity_detection = Pipeline.from_pretrained(
     "pyannote/voice-activity-detection",
-    use_auth_token=your_key)
+    use_auth_token=api_key)
 
 pipeline_speaker_diarization = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token=your_key)
+    use_auth_token=api_key)
 
 #%% data load
 df_train_label = pd.read_csv('train.csv', encoding='utf-8')
@@ -287,4 +287,5 @@ df_sample_submission = pd.concat((df_sample_submission['id'],df_predict_proba), 
 df_sample_submission.to_csv('sample_submission_8.csv', encoding = 'utf-8', index=False)
 
 print('predict_proba_complete')
+
 
